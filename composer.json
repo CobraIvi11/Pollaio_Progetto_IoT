@@ -1,0 +1,18 @@
+{
+    "name": "ivanv/pollaio_progetto_io-t",
+    "autoload": {
+        "psr-4": {
+            "Ivanv\\PollaioProgettoIoT\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "CobraIvi11",
+            "email": "119098882+CobraIvi11@users.noreply.github.com"
+        }
+    ],
+    "require": {
+        "php-mqtt/client": "^2.3",
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
