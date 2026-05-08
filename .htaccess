@@ -1,4 +1,5 @@
 RewriteEngine On
+RewriteBase /Pollaio_Progetto_IoT_WebApp/
 DirectoryIndex router.php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
