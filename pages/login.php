@@ -1,32 +1,24 @@
 <head>
     <title>Login</title>
-    <link rel="stylesheet" href="/pollaio_progetto_iot/style/style.css">
+    <link rel="stylesheet" href="/Pollaio_Progetto_Iot_WebApp/style/style.css">
 </head>
 
 <body>
 
-<form id="login-form" action="/pollaio_progetto_iot/home" method="POST">
+<form id="login-form" class="auth-form" action="/Pollaio_Progetto_Iot_WebApp/login" method="POST">
     <div class="logo-container">
-        <img src="/pollaio_progetto_iot/img/Logo.png" alt="Logo" class="brand-logo">
+        <img src="/Pollaio_Progetto_Iot_WebApp/img/Logo.png" alt="Logo" class="brand-logo">
     </div>
 
-    <h2 class="login-title">Login</h2>
+    <h2 class="title">Login</h2>
 
-    <label for="email" class="label-text"> Email: </label>
+    <label class="label-text">Email</label>
+    <input type="email" class="input-field" name="email" required>
 
-    <input type="email" id="email" class="input-field" name="email" placeholder="Inserisci la tua email" required>
+    <label class="label-text">Password</label>
+    <input type="password" class="input-field" name="password" required>
 
-    <label for="password" class="label-text"> Password: </label>
-
-    <input type="password" id="password" class="input-field" name="password" placeholder="Inserisci la password" required>
-
-    <input type="submit" id="login-button" class="btn-submit" value="Accedi">
-
-    <p class="forgot-password">
-        <a href="#" class="forgot-link">
-            Password dimenticata?
-        </a>
-    </p>
+    <input type="submit" class="btn-submit" value="Accedi">
 
 </form>
 

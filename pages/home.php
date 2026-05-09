@@ -10,7 +10,7 @@
     <h1>Ciao</h1>
     <p>Benvenuto nel sistema Pollaio IoT</p>
 
-    <a href="/pollaio_progetto_iot/login" class="home-button"> Torna al login </a>
+    <a href="/Pollaio_Progetto_Iot_WebApp/login" class="home-button"> Torna al login </a>
 
 </div>
 
