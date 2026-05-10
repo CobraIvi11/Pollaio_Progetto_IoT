@@ -29,6 +29,9 @@
     <label class="label-text">Password</label>
     <input type="password" name="password" class="input-field" required>
 
+    <label class="label-text">Conferma Password</label>
+    <input type="conferma" name="conferma" class="input-field" required>
+
     <input type="submit" class="btn-submit" value="Registrati">
 </form>
 
