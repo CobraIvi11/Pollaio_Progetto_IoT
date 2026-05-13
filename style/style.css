@@ -6,7 +6,7 @@ body {
     gap: 50px;
     flex-wrap: wrap;
     min-height: 100vh;
-    font-family: 'Arial';
+    font-family: 'Arial', sans-serif;
     background: #f4f4f2;
     padding: 20px;
 }
@@ -103,17 +103,20 @@ h2.title, .login-title {
     filter: brightness(1.1);
 }
 
-.forgot-password {
+
+.auth-footer, .forgot-password {
     margin-top: 20px;
+    text-align: center;
     font-size: 0.9rem;
+    color: #555;
 }
 
-.forgot-password a {
+.auth-footer a, .forgot-password a {
     color: #e2a00a;
     text-decoration: none;
     font-weight: 700;
 }
 
-.forgot-password a:hover {
+.auth-footer a:hover, .forgot-password a:hover {
     text-decoration: underline;
 }
