@@ -46,8 +46,7 @@ $temp  = $ultima['temperatura'] ?? null;
 $hum   = $ultima['umidita']     ?? null;
 $acqua = $ultima['acqua_perc']  ?? null;
 $luce  = $ultima['luce_val']    ?? null;
-$ora_ag = $ultima ? date('H:i', strtotime($ultima['ricevuto_il'])) : '--';
-$data_ag = $ultima ? date('d M Y', strtotime($ultima['ricevuto_il'])) : '--';
+$data_ag = $ultima ? date('d M Y', strtotime($ultima['ricevuto_il'])) : date('d M Y');
 
 function fmt($v, $dec = 1) { return $v !== null ? number_format($v, $dec) : '--'; }
 
@@ -96,267 +95,108 @@ $saluto = $ora_it < 12 ? 'Buongiorno' : ($ora_it < 18 ? 'Buon pomeriggio' : 'Buo
 <link rel="stylesheet" href="/Pollaio_Progetto_Iot_WebApp/style/home.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-/* ══════════════════════════════════════════
-   RESET & BASE
-══════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-    font-family: 'Sora', Arial, sans-serif;
-    background: #f0f2ee;
-    min-height: 100vh;
-    display: flex;
-}
-
-/* ══════════════════════════════════════════
-   SIDEBAR — mantiene lo stile originale
-══════════════════════════════════════════ */
+body { font-family: 'Sora', Arial, sans-serif; background: #f0f2ee; min-height: 100vh; display: flex; }
 .sidebar { font-family: 'Sora', Arial, sans-serif; }
 .nav-item { font-family: 'Sora', Arial, sans-serif; font-size: 0.84rem; }
 .user-name { font-family: 'Sora', Arial, sans-serif; }
+.main { flex: 1; padding: 36px 40px 60px; display: flex; flex-direction: column; gap: 28px; overflow-x: hidden; }
 
-/* ══════════════════════════════════════════
-   MAIN LAYOUT
-══════════════════════════════════════════ */
-.main {
-    flex: 1;
-    padding: 36px 40px 60px;
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-    overflow-x: hidden;
-}
-
-/* ══════════════════════════════════════════
-   TOPBAR
-══════════════════════════════════════════ */
-.topbar {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-.topbar-left {}
-.topbar-greeting {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #aaa;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 4px;
-}
-.topbar-title {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #1a2e18;
-    letter-spacing: -0.03em;
-    line-height: 1;
-}
+/* TOPBAR */
+.topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.topbar-greeting { font-size: 0.78rem; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+.topbar-title { font-size: 2rem; font-weight: 800; color: #1a2e18; letter-spacing: -0.03em; line-height: 1; }
 .topbar-title span { color: #4CAF50; }
 
+/* STATUS PILL */
 .status-pill {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: white;
-    border: 2px solid #e8f0e6;
-    border-radius: 16px;
-    padding: 10px 18px;
-    font-size: 0.78rem;
-    color: #888;
-    font-weight: 500;
-    white-space: nowrap;
+    display: flex; align-items: center; gap: 10px;
+    background: white; border: 2px solid #e8f0e6;
+    border-radius: 16px; padding: 10px 18px;
+    font-size: 0.78rem; color: #888; font-weight: 500; white-space: nowrap;
 }
-.status-pill strong { color: #2d5a27; font-size: 0.9rem; }
+.status-pill strong {
+    color: #2d5a27;
+    font-size: 1.05rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    display: block;
+    line-height: 1.2;
+}
 .status-pill small { color: #bbb; font-size: 0.72rem; display: block; font-family: 'JetBrains Mono', monospace; }
-.pulse {
-    width: 9px; height: 9px; border-radius: 50%;
-    background: #4CAF50;
-    box-shadow: 0 0 0 0 rgba(76,175,80,0.5);
-    animation: ripple 2s infinite;
-    flex-shrink: 0;
-}
+.pulse { width: 9px; height: 9px; border-radius: 50%; background: #4CAF50; box-shadow: 0 0 0 0 rgba(76,175,80,0.5); animation: ripple 2s infinite; flex-shrink: 0; }
 @keyframes ripple {
     0%   { box-shadow: 0 0 0 0 rgba(76,175,80,0.5); }
     70%  { box-shadow: 0 0 0 8px rgba(76,175,80,0); }
     100% { box-shadow: 0 0 0 0 rgba(76,175,80,0); }
 }
 
-/* ══════════════════════════════════════════
-   SECTION LABEL
-══════════════════════════════════════════ */
-.sec-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #c0c8be;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    margin-bottom: -12px;
-}
+/* SECTION LABEL */
+.sec-label { font-size: 0.7rem; font-weight: 700; color: #c0c8be; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: -12px; }
 
-/* ══════════════════════════════════════════
-   CARDS GRID
-══════════════════════════════════════════ */
-.cards-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-}
+/* CARDS */
+.cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 @media (max-width: 1100px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px)  { .cards-grid { grid-template-columns: 1fr; } }
 
 .scard {
-    background: white;
-    border-radius: 22px;
-    padding: 24px 22px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    border: 2px solid #eef2ec;
-    position: relative;
-    overflow: hidden;
+    background: white; border-radius: 22px; padding: 24px 22px 20px;
+    display: flex; flex-direction: column; gap: 14px;
+    border: 2px solid #eef2ec; position: relative; overflow: hidden;
     transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s;
     animation: slideUp 0.5s cubic-bezier(.34,1.2,.64,1) both;
 }
-.scard::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 22px;
-    opacity: 0;
-    transition: opacity 0.22s;
-}
 .scard:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(45,90,39,0.10); }
-.scard:hover::before { opacity: 1; }
 .scard:nth-child(1) { animation-delay: 0.05s; }
 .scard:nth-child(2) { animation-delay: 0.12s; }
 .scard:nth-child(3) { animation-delay: 0.19s; }
 .scard:nth-child(4) { animation-delay: 0.26s; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Accent strip on top */
 .scard-temp  { border-top: 4px solid #e2a00a; }
 .scard-hum   { border-top: 4px solid #42a5f5; }
 .scard-acqua { border-top: 4px solid #26a69a; }
 .scard-luce  { border-top: 4px solid #ffb300; }
 
 .card-top { display: flex; align-items: center; justify-content: space-between; }
-
-.card-icon-wrap {
-    width: 46px; height: 46px; border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.5rem;
-}
+.card-icon-wrap { width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
 .scard-temp  .card-icon-wrap { background: #fff8e6; }
 .scard-hum   .card-icon-wrap { background: #e8f4fd; }
 .scard-acqua .card-icon-wrap { background: #e0f2f1; }
 .scard-luce  .card-icon-wrap { background: #fffde7; }
 
-.card-badge {
-    font-size: 0.68rem; font-weight: 700;
-    padding: 4px 10px; border-radius: 20px;
-    letter-spacing: 0.02em;
-}
+.card-badge { font-size: 0.68rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.02em; }
 .badge-ok      { background: #e8f5e9; color: #2d5a27; }
 .badge-warn    { background: #fff8e6; color: #b14a06; }
 .badge-hot     { background: #fbe9e7; color: #c62828; }
 .badge-cold    { background: #e8eaf6; color: #283593; }
 .badge-neutral { background: #f5f5f5; color: #9e9e9e; }
 
-.card-body {}
-.card-label-txt {
-    font-size: 0.72rem; font-weight: 600;
-    color: #b0bba8; text-transform: uppercase;
-    letter-spacing: 0.08em; margin-bottom: 6px;
-}
-.card-value-big {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 2.8rem; font-weight: 600;
-    color: #1a2e18; line-height: 1;
-    letter-spacing: -0.02em;
-}
-.card-value-big .unit {
-    font-size: 1.1rem; color: #ccc; font-weight: 400; margin-left: 2px;
-}
+.card-label-txt { font-size: 0.72rem; font-weight: 600; color: #b0bba8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.card-value-big { font-family: 'JetBrains Mono', monospace; font-size: 2.8rem; font-weight: 600; color: #1a2e18; line-height: 1; letter-spacing: -0.02em; }
+.card-value-big .unit { font-size: 1.1rem; color: #ccc; font-weight: 400; margin-left: 2px; }
 
-.card-footer {
-    display: flex; align-items: center;
-    justify-content: space-between;
-    font-size: 0.72rem; color: #c0c8be;
-    border-top: 1.5px solid #f5f5f3;
-    padding-top: 12px;
-    font-weight: 500;
-}
+.card-footer { display: flex; align-items: center; justify-content: space-between; font-size: 0.72rem; color: #c0c8be; border-top: 1.5px solid #f5f5f3; padding-top: 12px; font-weight: 500; }
 .card-footer .avg-val { color: #4CAF50; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
 
-/* Mini sparkline canvas */
-.mini-chart-wrap { height: 38px; margin: -4px 0; }
-
-/* ══════════════════════════════════════════
-   CHART SECTION
-══════════════════════════════════════════ */
-.chart-section {
-    background: white;
-    border-radius: 22px;
-    padding: 28px 28px 24px;
-    border: 2px solid #eef2ec;
-    animation: slideUp 0.5s 0.3s cubic-bezier(.34,1.2,.64,1) both;
-}
-.chart-header {
-    display: flex; align-items: center;
-    justify-content: space-between;
-    margin-bottom: 22px; flex-wrap: wrap; gap: 12px;
-}
-.chart-title-wrap {}
-.chart-title {
-    font-size: 1rem; font-weight: 700;
-    color: #1a2e18; letter-spacing: -0.01em;
-}
+/* CHART */
+.chart-section { background: white; border-radius: 22px; padding: 28px 28px 24px; border: 2px solid #eef2ec; animation: slideUp 0.5s 0.3s cubic-bezier(.34,1.2,.64,1) both; }
+.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; gap: 12px; }
+.chart-title { font-size: 1rem; font-weight: 700; color: #1a2e18; letter-spacing: -0.01em; }
 .chart-sub { font-size: 0.72rem; color: #bbb; font-weight: 500; margin-top: 2px; }
 .chart-tabs { display: flex; gap: 6px; }
-.tab-btn {
-    padding: 6px 16px;
-    border-radius: 20px;
-    border: 2px solid #eef2ec;
-    background: white;
-    font-size: 0.74rem; font-weight: 700;
-    color: #aaa; cursor: pointer;
-    transition: all 0.18s;
-    font-family: 'Sora', Arial, sans-serif;
-    letter-spacing: 0.02em;
-}
-.tab-btn:hover, .tab-btn.active {
-    border-color: #4CAF50;
-    color: #2d5a27;
-    background: #f0f7ee;
-}
+.tab-btn { padding: 6px 16px; border-radius: 20px; border: 2px solid #eef2ec; background: white; font-size: 0.74rem; font-weight: 700; color: #aaa; cursor: pointer; transition: all 0.18s; font-family: 'Sora', Arial, sans-serif; }
+.tab-btn:hover { border-color: #4CAF50; color: #2d5a27; background: #f0f7ee; }
 .tab-btn.active { background: linear-gradient(135deg, #2d5a27, #4CAF50); color: white; border-color: transparent; }
 .chart-wrap { height: 220px; position: relative; }
 
-/* ══════════════════════════════════════════
-   STAT ROW
-══════════════════════════════════════════ */
-.stat-row {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 14px;
-}
+/* STAT ROW */
+.stat-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
 @media (max-width: 1100px) { .stat-row { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 640px)  { .stat-row { grid-template-columns: repeat(2, 1fr); } }
 
-.stat-tile {
-    background: white;
-    border-radius: 18px;
-    padding: 18px 16px;
-    border: 2px solid #eef2ec;
-    animation: slideUp 0.5s 0.35s cubic-bezier(.34,1.2,.64,1) both;
-    transition: transform 0.2s;
-}
+.stat-tile { background: white; border-radius: 18px; padding: 18px 16px; border: 2px solid #eef2ec; animation: slideUp 0.5s 0.35s cubic-bezier(.34,1.2,.64,1) both; transition: transform 0.2s; }
 .stat-tile:hover { transform: translateY(-3px); }
 .stat-tile-label { font-size: 0.68rem; font-weight: 700; color: #c0c8be; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
 .stat-tile-val   { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 600; color: #1a2e18; line-height: 1; }
@@ -368,72 +208,36 @@ body {
 .accent-yellow { background: linear-gradient(90deg, #b14a06, #ffb300); }
 .accent-gray   { background: linear-gradient(90deg, #555, #aaa); }
 
-/* ══════════════════════════════════════════
-   RANGE BAR (temperatura)
-══════════════════════════════════════════ */
-.range-row {
-    display: flex; align-items: center; gap: 10px; margin-top: 6px;
-}
-.range-track {
-    flex: 1; height: 5px; background: #f0f2ee; border-radius: 10px; position: relative; overflow: visible;
-}
-.range-fill {
-    height: 100%; border-radius: 10px;
-    background: linear-gradient(90deg, #42a5f5, #4CAF50, #e2a00a, #f44336);
-}
-.range-thumb {
-    position: absolute; top: 50%;
-    transform: translate(-50%, -50%);
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: #2d5a27;
-    border: 2px solid white;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
+/* RANGE BAR */
+.range-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.range-track { flex: 1; height: 5px; background: #f0f2ee; border-radius: 10px; position: relative; overflow: visible; }
+.range-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, #42a5f5, #4CAF50, #e2a00a, #f44336); }
+.range-thumb { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; border-radius: 50%; background: #2d5a27; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
 .range-lbl { font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; color: #bbb; font-weight: 500; }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<!-- SIDEBAR -->
 <div class="sidebar">
     <div class="sidebar-logo">
         <img src="/Pollaio_Progetto_Iot_WebApp/img/Logo.png" alt="Logo">
     </div>
     <nav class="nav-section">
         <a class="nav-item active" href="#">
-            <span class="ni-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-                    <rect x="3" y="3" width="7" height="7" rx="1"/>
-                    <rect x="14" y="3" width="7" height="7" rx="1"/>
-                    <rect x="3" y="14" width="7" height="7" rx="1"/>
-                    <rect x="14" y="14" width="7" height="7" rx="1"/>
-                </svg>
-            </span>
+            <span class="ni-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
             Dashboard
         </a>
         <a class="nav-item" href="#" style="margin-top:6px">
-            <span class="ni-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-                </svg>
-            </span>
+            <span class="ni-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
             Storico
         </a>
         <a class="nav-item" href="#" style="margin-top:6px">
-            <span class="ni-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                </svg>
-            </span>
+            <span class="ni-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
             Sensori
         </a>
         <a class="nav-item" href="/Pollaio_Progetto_Iot_WebApp/login" style="margin-top:auto">
-            <span class="ni-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-                </svg>
-            </span>
+            <span class="ni-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
             Esci
         </a>
     </nav>
@@ -448,28 +252,26 @@ body {
     </div>
 </div>
 
-<!-- ═══════════════ MAIN ═══════════════ -->
+<!-- MAIN -->
 <div class="main">
 
-    <!-- Topbar -->
     <div class="topbar">
         <div class="topbar-left">
             <div class="topbar-greeting"><?= $saluto ?></div>
             <div class="topbar-title">🐔 Pollaio <span>IoT</span></div>
         </div>
+        <!-- STATUS PILL con orologio live -->
         <div class="status-pill">
             <div class="pulse"></div>
             <div>
-                <strong><?= $ora_ag ?></strong>
+                <strong id="live-clock"></strong>
                 <small><?= $data_ag ?> · <?= $medie['totale'] ?? 0 ?> letture/24h</small>
             </div>
         </div>
     </div>
 
-    <!-- Sezione sensori -->
     <div class="sec-label">Sensori in tempo reale</div>
 
-    <!-- Cards -->
     <div class="cards-grid">
 
         <!-- Temperatura -->
@@ -532,7 +334,7 @@ body {
             </div>
             <?php if ($acqua !== null): ?>
             <div style="height:6px; background:#e0f2f1; border-radius:10px; overflow:hidden;">
-                <div style="height:100%; width:<?= min(100,(float)$acqua) ?>%; background:linear-gradient(90deg,#26a69a,#4CAF50); border-radius:10px; transition:width 1s ease;"></div>
+                <div style="height:100%; width:<?= min(100,(float)$acqua) ?>%; background:linear-gradient(90deg,#26a69a,#4CAF50); border-radius:10px;"></div>
             </div>
             <?php endif; ?>
             <div class="card-footer">
@@ -557,12 +359,12 @@ body {
             </div>
         </div>
 
-    </div><!-- /cards-grid -->
+    </div>
 
     <!-- Grafico -->
     <div class="chart-section">
         <div class="chart-header">
-            <div class="chart-title-wrap">
+            <div>
                 <div class="chart-title">Andamento ultime 20 letture</div>
                 <div class="chart-sub">Dati ricevuti via MQTT · topic: pollaio/telemetria</div>
             </div>
@@ -614,20 +416,28 @@ body {
         </div>
     </div>
 
-</div><!-- /main -->
+</div>
 
 <script>
+/* ── OROLOGIO LIVE ── */
+function tickClock() {
+    const now  = new Date();
+    const hh   = String(now.getHours()).padStart(2, '0');
+    const mm   = String(now.getMinutes()).padStart(2, '0');
+    const ss   = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('live-clock').textContent = hh + ':' + mm + ':' + ss;
+}
+tickClock();                        // primo render immediato, niente flickering
+setInterval(tickClock, 1000);
+
+/* ── CHART.JS ── */
 const labels  = <?= $labels ?>;
 const dTemp   = <?= $j_temp ?>;
 const dHum    = <?= $j_hum ?>;
 const dAcqua  = <?= $j_acqua ?>;
 const dLuce   = <?= $j_luce ?>;
 
-const base = {
-    tension: 0.45, fill: true, pointRadius: 4,
-    pointHoverRadius: 7, borderWidth: 2.5,
-    pointBackgroundColor: 'white', pointBorderWidth: 2,
-};
+const base = { tension: 0.45, fill: true, pointRadius: 4, pointHoverRadius: 7, borderWidth: 2.5, pointBackgroundColor: 'white', pointBorderWidth: 2 };
 
 const datasets = {
     temperatura: { ...base, label: 'Temperatura (°C)', data: dTemp,  borderColor: '#e2a00a', backgroundColor: 'rgba(226,160,10,0.07)',  pointBorderColor: '#e2a00a' },
@@ -636,13 +446,11 @@ const datasets = {
     luce:        { ...base, label: 'Luminosità (lx)',   data: dLuce,  borderColor: '#ffb300', backgroundColor: 'rgba(255,179,0,0.07)',  pointBorderColor: '#ffb300' },
 };
 
-const ctx = document.getElementById('mainChart').getContext('2d');
-const chart = new Chart(ctx, {
+const chart = new Chart(document.getElementById('mainChart').getContext('2d'), {
     type: 'line',
     data: { labels, datasets: [datasets.temperatura] },
     options: {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
         plugins: {
             legend: { display: false },
@@ -650,19 +458,12 @@ const chart = new Chart(ctx, {
                 backgroundColor: '#1a2e18',
                 titleFont: { family: 'Sora', size: 11, weight: '600' },
                 bodyFont:  { family: 'JetBrains Mono', size: 12 },
-                padding: 12, cornerRadius: 12,
-                displayColors: true, boxRadius: 4,
+                padding: 12, cornerRadius: 12, displayColors: true, boxRadius: 4,
             }
         },
         scales: {
-            x: {
-                grid: { color: '#f0f2ee', drawBorder: false },
-                ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#c0c8be', maxRotation: 0 }
-            },
-            y: {
-                grid: { color: '#f0f2ee', drawBorder: false },
-                ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#c0c8be' }
-            }
+            x: { grid: { color: '#f0f2ee', drawBorder: false }, ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#c0c8be', maxRotation: 0 } },
+            y: { grid: { color: '#f0f2ee', drawBorder: false }, ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#c0c8be' } }
         }
     }
 });
@@ -674,7 +475,7 @@ function showDs(key, btn) {
     chart.update('active');
 }
 
-// Auto-refresh ogni 30s
+// Auto-refresh pagina ogni 30s per aggiornare i dati dal DB
 setTimeout(() => location.reload(), 30000);
 </script>
 </body>
