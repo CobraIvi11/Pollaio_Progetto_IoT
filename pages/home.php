@@ -92,7 +92,7 @@ $saluto = $ora_it < 12 ? 'Buongiorno' : ($ora_it < 18 ? 'Buon pomeriggio' : 'Buo
     <title>Dashboard — Pollaio IoT</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/style/home.css">
+    <link rel="stylesheet" href="style/home.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

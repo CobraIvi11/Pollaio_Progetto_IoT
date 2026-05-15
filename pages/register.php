@@ -1,16 +1,18 @@
+<!DOCTYPE html>
+<html lang="it">
 <head>
+    <meta charset="UTF-8">
     <title>Registrazione - Pollaio IoT</title>
-    <link rel="stylesheet" href="/style/style.css">
+    <link rel="stylesheet" href="/Pollaio_Progetto_IoT_WebApp/style/style.css">
 </head>
 <body>
 
-<form id="register-form" class="auth-form" action="/home" method="POST">
+<form id="register-form" class="auth-form" action="/Pollaio_Progetto_IoT_WebApp/home" method="POST">
     <div class="logo-container">
-        <img src="/img/Logo.png" alt="Logo" class="brand-logo">
+        <img src="/Pollaio_Progetto_IoT_WebApp/img/Logo.png" alt="Logo" class="brand-logo">
     </div>
 
     <h2 class="title">REGISTRATI</h2>
-
     <div class="input-group">
         <div class="input-wrapper">
             <label class="label-text">Nome</label>
@@ -28,10 +30,12 @@
     <label class="label-text">Password</label>
     <input type="password" name="password" class="input-field" required>
 
-    <label class="label-text">Conferma Password</label>
-    <input type="password" name="conferma" class="input-field" required>
-
     <input type="submit" class="btn-submit" value="Registrati">
+
+    <p class="auth-footer">
+        Hai già un account? <a href="/Pollaio_Progetto_IoT_WebApp/login">Accedi qui</a>
+    </p>
 </form>
 
 </body>
+</html>

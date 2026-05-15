@@ -6,14 +6,25 @@ $routes = [
     'register'  => 'pages/register.php',
 ];
 
-// Con Herd/Nginx leggiamo l'URL direttamente dalla richiesta del server
 $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+$subfolder = '/Pollaio_Progetto_IoT_WebApp';
+
+if (strpos($url, $subfolder) === 0) {
+    $url = substr($url, strlen($subfolder));
+}
+
 $url = trim($url, '/');
 
 if (array_key_exists($url, $routes)) {
-    require $routes[$url];
+    if (file_exists($routes[$url])) {
+        require $routes[$url];
+    } else {
+        http_response_code(500);
+        echo "<h1>500 Errore Interno</h1><p>Il file di destinazione '{$routes[$url]}' non è stato trovato.</p>";
+    }
 } else {
-    // Gestione errore 404
     http_response_code(404);
     echo "<h1>404</h1><p>Pagina non trovata: /{$url}</p>";
 }
+?>

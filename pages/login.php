@@ -14,7 +14,7 @@
 
 <form id="login-form" class="auth-form" action="/login" method="POST">
     <div class="logo-container">
-        <img src="/img/Logo.png" alt="Logo" class="brand-logo">
+        <img src="img/Logo.png" alt="Logo" class="brand-logo">
     </div>
 
     <h2 class="title">Login</h2>
@@ -28,7 +28,7 @@
     <input type="submit" class="btn-submit" value="Accedi">
 
     <p class="auth-footer">
-        Non hai un account? <a href="/register">Registrati qui</a>
+        Non hai un account? <a href="pages/register.php">Registrati qui</a>
     </p>
 
 </form>

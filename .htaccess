@@ -1,6 +1,6 @@
 RewriteEngine On
 RewriteBase /Pollaio_Progetto_IoT_WebApp/
-DirectoryIndex router.php
+DirectoryIndex index.php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ router.php?url=$1 [QSA,L]
+RewriteRule ^(.*)$ index.php [QSA,L]
