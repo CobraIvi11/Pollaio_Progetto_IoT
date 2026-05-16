@@ -4,10 +4,13 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // ── PROTEZIONE ACCESSO (Controllo Sessione) ──
-if (!isset($_SESSION['user_nome'])) {
+// Aggiunto il controllo anche su 'user_id' per sicurezza
+if (!isset($_SESSION['user_nome']) || !isset($_SESSION['user_id'])) {
     header("Location: /Pollaio_Progetto_IoT_WebApp/login");
     exit;
 }
+
+$current_user_id = intval($_SESSION['user_id']); // ID dell'utente correntemente loggato
 
 // ── GESTIONE LOGOUT (POST) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['azione_logout'])) {
@@ -45,13 +48,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!empty($orario)) {
             try {
-                $stmt = $pdo->prepare("INSERT INTO orari_mangime (orario) VALUES (?)");
-                $stmt->execute([$orario]);
+                // Modificato: Ora inserisce anche l'utente_id dell'utente corrente
+                $stmt = $pdo->prepare("INSERT INTO orari_mangime (orario, utente_id) VALUES (?, ?)");
+                $stmt->execute([$orario, $current_user_id]);
                 $messaggio = "Orario programmato con successo!";
                 $tipo_messaggio = "success";
             } catch (PDOException $e) {
-                if ($e->getCode() == 23000) { // Errore Unique Key
-                    $messaggio = "Questo orario è già stato impostato.";
+                if ($e->getCode() == 23000) { // Errore Unique Key (chiave composta orario + utente)
+                    $messaggio = "Questo orario è già stato impostato da te.";
                 } else {
                     $messaggio = "Errore durante il salvataggio: " . $e->getMessage();
                 }
@@ -64,16 +68,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['azione']) && $_POST['azione'] === 'elimina') {
         $id = intval($_POST['id'] ?? 0);
         if ($id > 0) {
-            $stmt = $pdo->prepare("DELETE FROM orari_mangime WHERE id = ?");
-            $stmt->execute([$id]);
+            // Modificato: Controllo di sicurezza, l'orario viene eliminato solo se appartiene all'utente loggato
+            $stmt = $pdo->prepare("DELETE FROM orari_mangime WHERE id = ? AND utente_id = ?");
+            $stmt->execute([$id, $current_user_id]);
             $messaggio = "Programmazione rimossa.";
             $tipo_messaggio = "success";
         }
     }
 }
 
-// ── RECUPERO ORARI PROGRAMMATI ──
-$orari = $pdo->query("SELECT *, TIME_FORMAT(orario, '%H:%i') AS orario_fmt FROM orari_mangime ORDER BY orario ASC")->fetchAll(PDO::FETCH_ASSOC);
+// ── RECUPERO ORARI PROGRAMMATI (Filtrati per Utente) ──
+// Modificato: Recuperiamo solo gli orari associati all'utente corrente
+$stmt = $pdo->prepare("SELECT *, TIME_FORMAT(orario, '%H:%i') AS orario_fmt FROM orari_mangime WHERE utente_id = ? ORDER BY orario ASC");
+$stmt->execute([$current_user_id]);
+$orari = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $data_ag = date('d M Y');
 $nome_utente = htmlspecialchars(trim(($_SESSION['user_nome'] ?? 'Utente') . ' ' . ($_SESSION['user_cognome'] ?? '')));
@@ -90,7 +98,6 @@ $action_url = "/Pollaio_Progetto_IoT_WebApp/orari_mangime";
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- CSS Collegati: Struttura Base + Stile specifico della pagina -->
     <link rel="stylesheet" href="/Pollaio_Progetto_IoT_WebApp/style/struttura.css">
     <link rel="stylesheet" href="/Pollaio_Progetto_IoT_WebApp/style/orari_mangime.css">
 
@@ -142,7 +149,6 @@ $action_url = "/Pollaio_Progetto_IoT_WebApp/orari_mangime";
         <div class="nav-divider">Controllo Manuale</div>
         <p class="ctrl-notice">Vai alla pagina <strong>Dashboard</strong> per attivare i comandi hardware.</p>
 
-        <!-- Pulsanti Hardware Disabilitati -->
         <button class="nav-btn-ctrl" id="btn-luce" disabled>
             <span class="ni-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -171,7 +177,6 @@ $action_url = "/Pollaio_Progetto_IoT_WebApp/orari_mangime";
     </nav>
 </div>
 
-<!-- CORPO PRINCIPALE (MAIN) -->
 <div class="main">
     <div class="topbar">
         <div class="topbar-left">
@@ -194,7 +199,6 @@ $action_url = "/Pollaio_Progetto_IoT_WebApp/orari_mangime";
     <?php endif; ?>
 
     <div class="grid-container">
-        <!-- Pannello di Inserimento -->
         <div class="panel-card">
             <div class="panel-title">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -212,7 +216,6 @@ $action_url = "/Pollaio_Progetto_IoT_WebApp/orari_mangime";
             </form>
         </div>
 
-        <!-- Pannello Lista Orari Esistenti -->
         <div class="panel-card">
             <div class="panel-title">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
