@@ -1,0 +1,154 @@
+/* GRID STRUTTURA PANNELLI (Specifico della pagina orari) */
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 12px;
+}
+
+@media (max-width: 992px) {
+    .grid-container { grid-template-columns: 1fr; gap: 20px; }
+}
+
+/* PANNELLI CARD STILE DASHBOARD */
+.panel-card {
+    background: white;
+    border-radius: 22px;
+    padding: 28px;
+    border: 2px solid #eef2ec;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(45,90,39,0.02);
+    animation: slideUp 0.5s cubic-bezier(.34,1.2,.64,1) both;
+}
+
+.panel-card:nth-child(2) { animation-delay: 0.12s; }
+
+.panel-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #1a2e18;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.panel-title svg { color: #4CAF50; stroke: #4CAF50; }
+
+/* FORM CONTROLS (Input e Label) */
+.form-group { margin-bottom: 22px; }
+.form-group label {
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #8c9689;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e8f0e6;
+    border-radius: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 500;
+    box-sizing: border-box;
+    background-color: #f9fbf8;
+    color: #1a2e18;
+    transition: all 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4CAF50;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(76,175,80,0.12);
+}
+
+/* BOTTONE SALVATAGGIO REAZIONARIO */
+.btn-submit {
+    background: linear-gradient(135deg, #2d5a27, #4CAF50);
+    color: white;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s cubic-bezier(.34,1.2,.64,1);
+    box-shadow: 0 4px 12px rgba(45,90,39,0.15);
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(45,90,39,0.25);
+}
+
+.btn-submit:active { transform: translateY(0); }
+
+/* BANNER FEEDBACK ALERT */
+.alert {
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 0.84rem;
+    margin-bottom: 8px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    animation: slideUp 0.4s both;
+}
+.alert-success { background: #e8f5e9; color: #2d5a27; border: 2px solid #c8e6c9; }
+.alert-error { background: #fbe9e7; color: #c62828; border: 2px solid #ffcdd2; }
+
+/* LISTA ORARI ATTIVI */
+.orari-list { list-style: none; padding: 0; margin: 0; }
+
+.orario-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 6px;
+    border-bottom: 2px solid #f5f8f4;
+    transition: background 0.2s;
+}
+
+.orario-item:last-child { border-bottom: none; }
+
+.orario-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1a2e18;
+    background: #f0f2ee;
+    padding: 4px 12px;
+    border-radius: 8px;
+    letter-spacing: 0.02em;
+}
+
+/* BOTTONE ELIMINA */
+.btn-delete {
+    background: none;
+    border: 2px solid transparent;
+    color: #ef5350;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-delete:hover {
+    background: #fbe9e7;
+    border-color: #ffcdd2;
+    color: #c62828;
+}

@@ -4,6 +4,8 @@ $routes = [
     'login'     => 'pages/login.php',
     'home'      => 'pages/home.php',
     'register'  => 'pages/register.php',
+    'statistiche' => 'pages/statistiche.php',
+    'orari_mangime' => 'pages/orari_mangime.php',
 ];
 
 $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

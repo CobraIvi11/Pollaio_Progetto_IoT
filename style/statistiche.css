@@ -1,0 +1,60 @@
+/* ── COMPONENTI STATISTICHE AGGREGATE ── */
+.stat-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+}
+
+@media (max-width: 1100px) { .stat-row { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 640px)  { .stat-row { grid-template-columns: repeat(2, 1fr); } }
+
+.stat-tile {
+    background: white;
+    border-radius: 18px;
+    padding: 18px 16px;
+    border: 2px solid #eef2ec;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: slideUp 0.5s 0.35s cubic-bezier(.34,1.2,.64,1) both;
+}
+
+.stat-tile:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+}
+
+.stat-tile-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #c0c8be;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+}
+
+.stat-tile-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a2e18;
+    line-height: 1;
+}
+
+.stat-tile-sub {
+    font-size: 0.7rem;
+    color: #d0d8ce;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.stat-tile-accent {
+    width: 28px;
+    height: 3px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.accent-green  { background: linear-gradient(90deg, #2d5a27, #4CAF50); }
+.accent-blue   { background: linear-gradient(90deg, #1565C0, #42a5f5); }
+.accent-teal   { background: linear-gradient(90deg, #00695c, #26a69a); }
+.accent-yellow { background: linear-gradient(90deg, #b14a06, #ffb300); }
+.accent-gray   { background: linear-gradient(90deg, #555, #aaa); }
