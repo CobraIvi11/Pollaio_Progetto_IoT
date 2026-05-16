@@ -3,17 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$host = "localhost";
-$db_name = "pollaio_iot";
-$username = "root";
-$password_db = "";
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $username, $password_db);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Errore di connessione al database: " . $e->getMessage());
-}
+require_once 'db.php';
 
 $error_message = "";
 $registration_success = false;
@@ -21,11 +11,14 @@ $registration_success = false;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nome = trim($_POST['nome']);
     $cognome = trim($_POST['cognome']);
-    $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
+    $email = filter_var(trim($_POST['email']));
     $password = trim($_POST['password']);
 
     if (!empty($nome) && !empty($cognome) && !empty($email) && !empty($password)) {
         try {
+            $db = Database::getInstance();
+            $pdo = $db->getConnection();
+
             $stmt_check = $pdo->prepare("SELECT id FROM utenti WHERE email = :email");
             $stmt_check->execute(['email' => $email]);
 
@@ -33,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $error_message = "Questa email è già registrata.";
             } else {
                 $sql = "INSERT INTO utenti (nome, cognome, email, password, creato_il, aggiornato_il) 
-                        VALUES (:nome, :cognome, :email, :password, NOW(), NOW())";
+                        VALUES (:nome, :cognome, :email, PASSWORD(:password), NOW(), NOW())";
 
                 $stmt_insert = $pdo->prepare($sql);
                 $stmt_insert->execute([
@@ -54,8 +47,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="it">
 <head>
     <meta charset="UTF-8">
     <title>Registrazione - Pollaio IoT</title>
@@ -120,4 +111,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 
 </body>
-</html>

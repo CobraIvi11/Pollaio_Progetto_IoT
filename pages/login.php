@@ -1,20 +1,8 @@
 <?php
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-$host = "localhost";
-$db_name = "pollaio_iot";
-$username = "root";
-$password_db = "";
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $username, $password_db);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Errore di connessione al database: " . $e->getMessage());
-}
+require_once 'db.php';
 
 $error_message = "";
 
@@ -24,24 +12,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!empty($email) && !empty($password)) {
         try {
-            $stmt = $pdo->prepare("SELECT * FROM utenti WHERE email = :email");
-            $stmt->execute(['email' => $email]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $pdo = Database::getInstance()->getConnection();
+
+
+            $stmt = $pdo->prepare("SELECT * FROM utenti WHERE email = :email AND password = PASSWORD(:password)");
+
+            $stmt->execute([
+                    'email' => $email,
+                    'password' => $password
+            ]);
+
+            $user = $stmt->fetch();
 
             if ($user) {
-                if ($password === $user['password']) {
+                $_SESSION['user_email'] = $user['email'];
+                $_SESSION['user_nome'] = $user['nome'];
+                $_SESSION['user_cognome'] = $user['cognome'];
 
-                    $_SESSION['user_email'] = $user['email'];
-                    $_SESSION['user_nome'] = $user['nome'];
-                    $_SESSION['user_cognome'] = $user['cognome'];
-
-                    header("Location: /Pollaio_Progetto_IoT_WebApp/home");
-                    exit;
-                } else {
-                    $error_message = "Password errata.";
-                }
+                header("Location: /Pollaio_Progetto_IoT_WebApp/home");
+                exit;
             } else {
-                $error_message = "Nessun utente trovato con questa email.";
+
+                $error_message = "Email o Password errata.";
             }
         } catch (PDOException $e) {
             $error_message = "Errore di sistema: " . $e->getMessage();
@@ -52,8 +44,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="it">
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
@@ -89,4 +79,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </form>
 
 </body>
-</html>
