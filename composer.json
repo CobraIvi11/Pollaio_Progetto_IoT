@@ -11,5 +11,7 @@
             "email": "119098882+CobraIvi11@users.noreply.github.com"
         }
     ],
-    "require": {}
+    "require": {
+        "php-mqtt/client": "^2.3"
+    }
 }

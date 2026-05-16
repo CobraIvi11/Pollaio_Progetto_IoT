@@ -3,14 +3,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// ── PROTEZIONE ACCESSO (Controllo Sessione) ──
-// Aggiunto il controllo anche su 'user_id' per sicurezza
-if (!isset($_SESSION['user_nome']) || !isset($_SESSION['user_id'])) {
+// ── PROTEZIONE ACCESSO ──
+if (!isset($_SESSION['user_nome'])) {
     header("Location: /Pollaio_Progetto_IoT_WebApp/login");
     exit;
 }
-
-$current_user_id = intval($_SESSION['user_id']); // ID dell'utente correntemente loggato
 
 // ── GESTIONE LOGOUT (POST) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['azione_logout'])) {
@@ -24,77 +21,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['azione_logout'])) {
     exit;
 }
 
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once 'db.php';
+// ── LETTURA ALERT MQTT DA SESSIONE ──
+$mqtt_successo = $_SESSION['mqtt_successo'] ?? '';
+$mqtt_errore   = $_SESSION['mqtt_errore']   ?? '';
+unset($_SESSION['mqtt_successo'], $_SESSION['mqtt_errore']);
 
-use Dotenv\Dotenv;
-$dotenv = Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load();
-
-try {
-    $pdo = Database::getInstance()->getConnection();
-} catch (Exception $e) {
-    die("Errore configurazione applicazione: " . $e->getMessage());
-}
-
-// ── GESTIONE AZIONI (POST) ──
-$messaggio = '';
-$tipo_messaggio = ''; // 'success' o 'error'
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // 1. Aggiungi Orario
-    if (isset($_POST['azione']) && $_POST['azione'] === 'aggiungi') {
-        $orario = $_POST['orario'] ?? '';
-
-        if (!empty($orario)) {
-            try {
-                // Modificato: Ora inserisce anche l'utente_id dell'utente corrente
-                $stmt = $pdo->prepare("INSERT INTO orari_mangime (orario, utente_id) VALUES (?, ?)");
-                $stmt->execute([$orario, $current_user_id]);
-                $messaggio = "Orario programmato con successo!";
-                $tipo_messaggio = "success";
-            } catch (PDOException $e) {
-                if ($e->getCode() == 23000) { // Errore Unique Key (chiave composta orario + utente)
-                    $messaggio = "Questo orario è già stato impostato da te.";
-                } else {
-                    $messaggio = "Errore durante il salvataggio: " . $e->getMessage();
-                }
-                $tipo_messaggio = "error";
-            }
-        }
-    }
-
-    // 2. Erase Orario
-    if (isset($_POST['azione']) && $_POST['azione'] === 'elimina') {
-        $id = intval($_POST['id'] ?? 0);
-        if ($id > 0) {
-            // Modificato: Controllo di sicurezza, l'orario viene eliminato solo se appartiene all'utente loggato
-            $stmt = $pdo->prepare("DELETE FROM orari_mangime WHERE id = ? AND utente_id = ?");
-            $stmt->execute([$id, $current_user_id]);
-            $messaggio = "Programmazione rimossa.";
-            $tipo_messaggio = "success";
-        }
-    }
-}
-
-// ── RECUPERO ORARI PROGRAMMATI (Filtrati per Utente) ──
-// Modificato: Recuperiamo solo gli orari associati all'utente corrente
-$stmt = $pdo->prepare("SELECT *, TIME_FORMAT(orario, '%H:%i') AS orario_fmt FROM orari_mangime WHERE utente_id = ? ORDER BY orario ASC");
-$stmt->execute([$current_user_id]);
-$orari = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$data_ag = date('d M Y');
+$data_ag     = date('d M Y');
 $nome_utente = htmlspecialchars(trim(($_SESSION['user_nome'] ?? 'Utente') . ' ' . ($_SESSION['user_cognome'] ?? '')));
+$id_utente   = $_SESSION['user_id'] ?? null;
 
-// Definizione della rotta corretta per i form compatibile con il router
-$action_url = "/Pollaio_Progetto_IoT_WebApp/orari_mangime";
+// ── INIZIALIZZAZIONE DEFAULT VIA HARDWARE/MEMORIA ──
+$pasto_mattina_salvato = "08:00";
+$pasto_pomeriggio_salvato = "17:00";
+
+if ($id_utente) {
+    try {
+        require_once 'db.php';
+        $db = Database::getInstance()->getConnection();
+
+        // Cerchiamo se l'utente loggato ha già un record salvato
+        $stmt = $db->prepare("SELECT pasto_mattina, pasto_pomeriggio FROM orari_mangime WHERE id_utente = :id_utente LIMIT 1");
+        $stmt->execute([':id_utente' => $id_utente]);
+        $orari_db = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Se esiste nel DB, sovrascriviamo le variabili con i dati reali dell'utente
+        if ($orari_db && !empty($orari_db['pasto_mattina']) && !empty($orari_db['pasto_pomeriggio'])) {
+            $pasto_mattina_salvato = substr($orari_db['pasto_mattina'], 0, 5);
+            $pasto_pomeriggio_salvato = substr($orari_db['pasto_pomeriggio'], 0, 5);
+        }
+    } catch (\Exception $e) {
+        // In caso di errore nel DB (es. tabella non pronta), restano i default (08:00 e 17:00)
+        $pasto_mattina_salvato = "08:00";
+        $pasto_pomeriggio_salvato = "17:00";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programmazione Mangime — Pollaio IoT</title>
+    <title>Orari Mangime — Pollaio IoT</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
@@ -102,7 +69,6 @@ $action_url = "/Pollaio_Progetto_IoT_WebApp/orari_mangime";
     <link rel="stylesheet" href="/Pollaio_Progetto_IoT_WebApp/style/orari_mangime.css">
 
     <style>
-        /* Stile locale per la nota di avviso nella sidebar */
         .ctrl-notice {
             font-size: 0.78rem;
             color: #a0aaa0;
@@ -142,7 +108,7 @@ $action_url = "/Pollaio_Progetto_IoT_WebApp/orari_mangime";
         <a class="nav-item active" href="/Pollaio_Progetto_IoT_WebApp/orari_mangime">
             <span class="ni-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-             </span>
+            </span>
             Orari Mangime
         </a>
 
@@ -181,7 +147,7 @@ $action_url = "/Pollaio_Progetto_IoT_WebApp/orari_mangime";
     <div class="topbar">
         <div class="topbar-left">
             <div class="topbar-greeting">Pianificazione · <strong><?= $nome_utente ?></strong></div>
-            <div class="topbar-title">Alimentazione <span>Automatica</span></div>
+            <div class="topbar-title">Orari <span>Mangime</span></div>
         </div>
         <div class="status-pill">
             <div class="pulse"></div>
@@ -192,64 +158,41 @@ $action_url = "/Pollaio_Progetto_IoT_WebApp/orari_mangime";
         </div>
     </div>
 
-    <div class="sec-label">Pianificazione dei pasti e configurazione oraria del servo-motore.</div>
+    <div class="sec-label">Impostazione pasti giornalieri per l'ESP32 (via MQTT)</div>
 
-    <?php if (!empty($messaggio)): ?>
-        <div class="alert alert-<?= $tipo_messaggio ?>"><?= $messaggio ?></div>
+    <?php if (!empty($mqtt_successo)): ?>
+        <div class="alert alert-success"><?= htmlspecialchars($mqtt_successo) ?></div>
+    <?php endif; ?>
+    <?php if (!empty($mqtt_errore)): ?>
+        <div class="alert alert-error"><?= htmlspecialchars($mqtt_errore) ?></div>
     <?php endif; ?>
 
-    <div class="grid-container">
-        <div class="panel-card">
-            <div class="panel-title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                Aggiungi un nuovo orario
-            </div>
-            <form action="<?= $action_url ?>" method="POST">
-                <input type="hidden" name="azione" value="aggiungi">
-
-                <div class="form-group">
-                    <label for="orario">Seleziona l'orario di erogazione</label>
-                    <input type="time" id="orario" name="orario" class="form-control" required>
-                </div>
-
-                <button type="submit" class="btn-submit">Salva Programmazione</button>
-            </form>
+    <div class="panel-card">
+        <div class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Invia orari pasti all'ESP32
         </div>
 
-        <div class="panel-card">
-            <div class="panel-title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                Orari attivi
-            </div>
-
-            <?php if (empty($orari)): ?>
-                <div style="color: #b0bba8; font-size: 0.84rem; font-weight: 500; text-align: center; padding: 40px 0;">
-                    Nessun orario impostato. Il pollaio verrà alimentato solo manualmente.
+        <form action="/Pollaio_Progetto_IoT_WebApp/imposta_orari" method="POST">
+            <div class="grid-container" style="gap: 16px; margin-top: 0;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="pasto_mattina">🌅 Pasto Mattina</label>
+                    <input type="time" id="pasto_mattina" name="pasto_mattina" class="form-control" value="<?= htmlspecialchars($pasto_mattina_salvato) ?>" required>
                 </div>
-            <?php else: ?>
-                <ul class="orari-list">
-                    <?php foreach ($orari as $o): ?>
-                        <li class="orario-item">
-                            <div>
-                                <span class="orario-time"><?= $o['orario_fmt'] ?></span>
-                            </div>
-                            <form action="<?= $action_url ?>" method="POST" onsubmit="return confirm('Vuoi davvero eliminare questo orario?');">
-                                <input type="hidden" name="azione" value="elimina">
-                                <input type="hidden" name="id" value="<?= $o['id'] ?>">
-                                <button type="submit" class="btn-delete" title="Elimina orario">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                                </button>
-                            </form>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            <?php endif; ?>
-        </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="pasto_pomeriggio">🌆 Pasto Pomeriggio</label>
+                    <input type="time" id="pasto_pomeriggio" name="pasto_pomeriggio" class="form-control" value="<?= htmlspecialchars($pasto_pomeriggio_salvato) ?>" required>
+                </div>
+            </div>
+            <div style="margin-top: 22px;">
+                <button type="submit" class="btn-submit">📡 Invia al Pollaio via MQTT</button>
+            </div>
+        </form>
     </div>
+
 </div>
 
 <script>
-    // Orologio Real-time in alto a destra
     function tickClock() {
         const now = new Date();
         const pad = n => String(n).padStart(2, '0');

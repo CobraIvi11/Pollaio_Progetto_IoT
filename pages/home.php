@@ -26,8 +26,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
 require_once 'db.php';
 
 use Dotenv\Dotenv;
-$dotenv = Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load();
 
 try {
     $pdo = Database::getInstance()->getConnection();

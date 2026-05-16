@@ -1,11 +1,12 @@
 <?php
 $routes = [
-    ''          => 'pages/login.php',
-    'login'     => 'pages/login.php',
-    'home'      => 'pages/home.php',
-    'register'  => 'pages/register.php',
-    'statistiche' => 'pages/statistiche.php',
+    ''              => 'pages/login.php',
+    'login'         => 'pages/login.php',
+    'home'          => 'pages/home.php',
+    'register'      => 'pages/register.php',
+    'statistiche'   => 'pages/statistiche.php',
     'orari_mangime' => 'pages/orari_mangime.php',
+    'imposta_orari' => 'pages/imposta_orari.php',
 ];
 
 $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
