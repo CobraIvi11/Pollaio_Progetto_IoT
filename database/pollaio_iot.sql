@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Mag 16, 2026 alle 18:10
+-- Creato il: Mag 18, 2026 alle 10:19
 -- Versione del server: 10.4.32-MariaDB
 -- Versione PHP: 8.2.12
 
@@ -55,17 +55,16 @@ CREATE TABLE IF NOT EXISTS `orari_mangime` (
     `pasto_pomeriggio` time NOT NULL,
     `data_creazione` timestamp NOT NULL DEFAULT current_timestamp(),
     PRIMARY KEY (`id`),
-    KEY `id_utente` (`id_utente`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+    UNIQUE KEY `unique_utente` (`id_utente`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dump dei dati per la tabella `orari_mangime`
 --
 
 INSERT INTO `orari_mangime` (`id`, `id_utente`, `pasto_mattina`, `pasto_pomeriggio`, `data_creazione`) VALUES
-                                                                                                           (4, 8, '08:00:00', '17:00:00', '2026-05-16 16:08:37'),
-                                                                                                           (5, 8, '08:50:00', '17:45:00', '2026-05-16 16:08:52'),
-                                                                                                           (6, 9, '08:50:00', '19:32:00', '2026-05-16 16:09:30');
+                                                                                                           (9, 10, '08:30:00', '17:00:00', '2026-05-16 16:25:01'),
+                                                                                                           (10, 8, '08:00:00', '17:50:00', '2026-05-16 16:28:35');
 
 -- --------------------------------------------------------
 
@@ -84,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `utenti` (
     `aggiornato_il` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
     PRIMARY KEY (`id`),
     UNIQUE KEY `email` (`email`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dump dei dati per la tabella `utenti`
@@ -92,7 +91,8 @@ CREATE TABLE IF NOT EXISTS `utenti` (
 
 INSERT INTO `utenti` (`id`, `nome`, `cognome`, `email`, `password`, `creato_il`, `aggiornato_il`) VALUES
                                                                                                       (8, 'Mario', 'Rossi', 'mario.rossi@example.com', '*6F44F3EB8058831613BCEF7D504F04AF5BD34F78', '2026-05-16 11:10:47', '2026-05-16 11:10:47'),
-                                                                                                      (9, 'ivan', 'viero', 'ivanviero@example.com', '*6F44F3EB8058831613BCEF7D504F04AF5BD34F78', '2026-05-16 15:09:07', '2026-05-16 15:09:07');
+                                                                                                      (9, 'ivan', 'viero', 'ivanviero@example.com', '*6F44F3EB8058831613BCEF7D504F04AF5BD34F78', '2026-05-16 15:09:07', '2026-05-16 15:09:07'),
+                                                                                                      (10, 'mattia', 'boaro', 'boaro@example.com', '*91169DB308171F2A1F7FB353D835EFDB4B8A72C9', '2026-05-16 18:17:27', '2026-05-16 18:17:27');
 
 --
 -- Limiti per le tabelle scaricate
