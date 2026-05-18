@@ -4,6 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once 'db.php';
+require_once 'config.php';
 
 $error_message = "";
 $registration_success = false;
@@ -50,13 +51,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Registrazione - Pollaio IoT</title>
-    <link rel="stylesheet" href="/Pollaio_Progetto_IoT_WebApp/style/style.css">
+    <link rel="stylesheet" href="<?=BASE_URL?>/style/style.css">
 </head>
 <body>
 
 <div class="auth-form">
     <div class="logo-container">
-        <img src="/Pollaio_Progetto_IoT_WebApp/img/Logo.png" alt="Logo" class="brand-logo">
+        <img src="<?=BASE_URL?>/img/Logo.png" alt="Logo" class="brand-logo">
     </div>
 
     <?php if ($registration_success): ?>
@@ -68,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <p style="text-align: center; margin-bottom: 30px; color: #555;">
             Adesso puoi utilizzare le tue credenziali per accedere al pannello di controllo.
         </p>
-        <a href="/Pollaio_Progetto_IoT_WebApp/login" class="btn-submit" style="text-align: center; display: block; text-decoration: none; line-height: inherit;">
+        <a href="<?=BASE_URL?>/login" class="btn-submit" style="text-align: center; display: block; text-decoration: none; line-height: inherit;">
             Torna al Login
         </a>
 
@@ -103,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="submit" class="btn-submit" value="Registrati">
 
             <p class="auth-footer">
-                Hai già un account? <a href="/Pollaio_Progetto_IoT_WebApp/login">Accedi qui</a>
+                Hai già un account? <a href="<?=BASE_URL?>/login">Accedi qui</a>
             </p>
         </form>
 

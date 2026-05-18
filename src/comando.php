@@ -58,7 +58,8 @@ try {
         ->setUsername($username)
         ->setPassword($password)
         ->setKeepAliveInterval(30)
-        ->setUseTls(false);
+        ->setUseTls(true)
+        ->setTlsVerifyPeer(false);
 
     $mqtt = new MqttClient($server, $port, $clientId);
     $mqtt->connect($settings, true);

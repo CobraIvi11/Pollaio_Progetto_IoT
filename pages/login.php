@@ -3,6 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require_once 'db.php';
+require_once 'config.php';
 
 $error_message = "";
 
@@ -30,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['user_nome'] = $user['nome'];
                 $_SESSION['user_cognome'] = $user['cognome'];
 
-                header("Location: /Pollaio_Progetto_IoT_WebApp/home");
+                header("Location: " . BASE_URL . "/home");
                 exit;
             } else {
 
@@ -48,13 +49,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <link rel="stylesheet" href="/Pollaio_Progetto_IoT_WebApp/style/style.css">
+    <link rel="stylesheet" href="/style/style.css">
 </head>
 <body>
 
 <form id="login-form" class="auth-form" action="" method="POST">
     <div class="logo-container">
-        <img src="/Pollaio_Progetto_IoT_WebApp/img/Logo.png" alt="Logo" class="brand-logo">
+        <img src="/img/Logo.png" alt="Logo" class="brand-logo">
     </div>
 
     <h2 class="title">Login</h2>
@@ -74,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <input type="submit" class="btn-submit" value="Accedi">
 
     <p class="auth-footer">
-        Non hai un account? <a href="/Pollaio_Progetto_IoT_WebApp/register">Registrati qui</a>
+        Non hai un account? <a href="/register">Registrati qui</a>
     </p>
 
 </form>

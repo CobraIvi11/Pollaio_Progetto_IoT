@@ -11,7 +11,7 @@ $routes = [
 
 $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-$subfolder = '/Pollaio_Progetto_IoT_WebApp';
+$subfolder = '/' . basename(__DIR__);
 
 if (strpos($url, $subfolder) === 0) {
     $url = substr($url, strlen($subfolder));

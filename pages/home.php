@@ -1,9 +1,10 @@
 <?php
 session_start();
+require_once __DIR__ . '/../config.php';
 
 // ── PROTEZIONE ACCESSO (Controllo Sessione) ──
 if (!isset($_SESSION['user_nome'])) {
-    header("Location: /Pollaio_Progetto_IoT_WebApp/login");
+    header("Location: " . BASE_URL . "/login");
     exit;
 }
 
@@ -18,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['azione_logout'])) {
         );
     }
     session_destroy();
-    header("Location: /Pollaio_Progetto_IoT_WebApp/login");
+    header("Location: " . BASE_URL . "/login");
     exit;
 }
 
@@ -132,8 +133,8 @@ $chartData = [
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
     <!-- I due CSS Caricati insieme -->
-    <link rel="stylesheet" href="/Pollaio_Progetto_IoT_WebApp/style/struttura.css">
-    <link rel="stylesheet" href="/Pollaio_Progetto_IoT_WebApp/style/home.css">
+    <link rel="stylesheet" href="/style/struttura.css">
+    <link rel="stylesheet" href="/style/home.css">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -141,24 +142,24 @@ $chartData = [
 
 <div class="sidebar">
     <div class="sidebar-logo">
-        <img src="/Pollaio_Progetto_IoT_WebApp/img/Logo.png" alt="Logo" class="brand-logo">
+        <img src="<?=BASE_URL?>/img/Logo.png" alt="Logo" class="brand-logo">
     </div>
     <nav class="nav-section">
-        <a class="nav-item active" href="/Pollaio_Progetto_IoT_WebApp/home">
+        <a class="nav-item active" href="<?=BASE_URL?>/home">
             <span class="ni-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
             </span>
             Dashboard
         </a>
 
-        <a class="nav-item" href="/Pollaio_Progetto_IoT_WebApp/statistiche">
+        <a class="nav-item" href="<?=BASE_URL?>/statistiche">
             <span class="ni-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             </span>
             Statistiche 24h
         </a>
 
-        <a class="nav-item" href="/Pollaio_Progetto_IoT_WebApp/orari_mangime">
+        <a class="nav-item" href="<?=BASE_URL?>/orari_mangime">
             <span class="ni-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
              </span>
@@ -362,7 +363,7 @@ $chartData = [
 
     async function sendCommand(dispositivo, stato) {
         try {
-            await fetch('/src/comando.php', {
+            await fetch('<?=BASE_URL?>/src/comando.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ dispositivo, stato })
