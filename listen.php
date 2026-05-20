@@ -28,7 +28,7 @@ try {
 // 2. CONFIGURAZIONE HIVEMQ CLOUD (Presa dal .env)
 // ==========================================
 $server   = $_ENV['MQTT_SERVER'];
-$port     = (int)$_ENV['MQTT_PORT'];
+$port     = $_ENV['MQTT_PORT'];
 $clientId = 'PHP_Server_' . uniqid();
 $user     = $_ENV['MQTT_USER'];
 $password = $_ENV['MQTT_PASS'];

@@ -133,8 +133,8 @@ $chartData = [
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
     <!-- I due CSS Caricati insieme -->
-    <link rel="stylesheet" href="/style/struttura.css">
-    <link rel="stylesheet" href="/style/home.css">
+    <link rel="stylesheet" href="<?=BASE_URL?>/style/struttura.css">
+    <link rel="stylesheet" href="<?=BASE_URL?>/style/home.css">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>

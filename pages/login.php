@@ -49,13 +49,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <link rel="stylesheet" href="/style/style.css">
+    <link rel="stylesheet" href="<?=BASE_URL?>/style/style.css">
 </head>
 <body>
 
 <form id="login-form" class="auth-form" action="" method="POST">
     <div class="logo-container">
-        <img src="/img/Logo.png" alt="Logo" class="brand-logo">
+        <img src="<?=BASE_URL?>/img/Logo.png" alt="Logo" class="brand-logo">
     </div>
 
     <h2 class="title">Login</h2>

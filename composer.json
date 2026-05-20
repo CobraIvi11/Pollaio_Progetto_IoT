@@ -12,6 +12,7 @@
         }
     ],
     "require": {
-        "php-mqtt/client": "^2.3"
+        "php-mqtt/client": "^2.3",
+        "vlucas/phpdotenv": "^5.6"
     }
 }
