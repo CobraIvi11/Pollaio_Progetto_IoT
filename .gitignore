@@ -1,5 +1,5 @@
 vendor/
 .env
+config.php
 .idea/
 *.iml
-config.php
