@@ -184,8 +184,15 @@ $chartData = [
             <span class="ctrl-state" id="state-mangime">PRONTO</span>
         </button>
 
+        <a class="nav-item" href="<?=BASE_URL?>/imposta_pin" style="margin-top:8px">
+            <span class="ni-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            </span>
+            PIN App
+        </a>
+
         <!-- MODIFICATO: Sostituito margin-top: auto con un margine fisso controllato per compattare lo spazio -->
-        <form action="" method="POST" style="margin-top: 32px; width: 100%;">
+        <form action="" method="POST" style="margin-top: 12px; width: 100%;">
             <input type="hidden" name="azione_logout" value="1">
             <button type="submit" class="nav-item" style="background: none; border: none; width: 100%; text-align: left; cursor: pointer; font-family: inherit;">
                 <span class="ni-icon">

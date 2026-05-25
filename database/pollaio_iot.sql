@@ -79,6 +79,7 @@ CREATE TABLE IF NOT EXISTS `utenti` (
     `cognome` varchar(50) NOT NULL,
     `email` varchar(150) NOT NULL,
     `password` varchar(255) NOT NULL,
+    `pin` varchar(255) DEFAULT NULL COMMENT 'PIN app mobile (hash SHA2)',
     `creato_il` datetime NOT NULL DEFAULT current_timestamp(),
     `aggiornato_il` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
     PRIMARY KEY (`id`),
