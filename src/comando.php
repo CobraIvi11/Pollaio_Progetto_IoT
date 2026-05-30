@@ -7,13 +7,13 @@
 session_start();
 header('Content-Type: application/json');
 
-// Solo utenti autenticati - TOLTO FINCHE LOGIN NON E FUNZIOANNTE
-/*if (empty($_SESSION['nome'])) {
+// Solo utenti autenticati
+if (empty($_SESSION['nome'])) {
     http_response_code(401);
     echo json_encode(['ok' => false, 'errore' => 'Non autenticato']);
     exit;
 }
-*/
+
 
 // Leggi il body JSON
 $body = json_decode(file_get_contents('php://input'), true);
